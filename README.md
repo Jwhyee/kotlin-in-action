@@ -37,16 +37,16 @@
 - 코드 업로드 파일 : 자유
 
 #### 경로 규칙
-  - `/src/main/kotlin` 내부에 본인 성(Last Name)을 패키지로 생성 한 뒤 그 안에서 학습 내용을 정리합니다.
+  - `/src/main/kotlin/action` 내부에 본인 성(Last Name)을 패키지로 생성 한 뒤 그 안에서 학습 내용을 정리합니다.
 
 ```bash
 # 아래 경로에 맞춰서 올려주세요! 
-/src/main/kotlin/{last-name}/{chapter-number}/{chapter-number}.md
+/src/main/kotlin/action/{last-name}/{chapter-number}/{chapter-number}.md
 
 # 예시
-/src/main/kotlin/jaeeun/chapter02/chapter02.md
-/src/main/kotlin/jaeeun/chapter03/chapter03.md
-/src/main/kotlin/jaeeun/chapter04/chapter04.md
+/src/main/kotlin/action/jaeeun/chapter02/chapter02.md
+/src/main/kotlin/action/jaeeun/chapter03/chapter03.md
+/src/main/kotlin/action/jaeeun/chapter04/chapter04.md
 ```
 
 #### 커밋 메시지 컨벤션
