@@ -5,11 +5,15 @@
           <thead>
               <tr>
                   <th><a href="https://github.com/Jaeeun1083">박재은</a></th>
+                  <th><a href="https://github.com/Jwhyee">가준영</a></th>
+                  <th><a href="https://github.com/dalcon10028">이연권</a></th>
               </tr>
           </thead>
           <tbody>
               <tr>
                   <td><img src="https://avatars.githubusercontent.com/u/78838791?v=4" width="120" height="120"/></td>
+                  <td><img src="https://avatars.githubusercontent.com/u/82663161?v=4" width="120" height="120"/></td>
+                  <td><img src="https://avatars.githubusercontent.com/u/30119526?v=4" width="120" height="120"/></td>
               </tr>
           </tbody>
       </table>
