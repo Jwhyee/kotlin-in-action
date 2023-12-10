@@ -39,8 +39,8 @@
 ### [업로드 규칙]
 
 #### 네이밍 규칙
-- md 파일 : chapter + 번호
-  - 예) `chapter01.md`, `chapter02.md`, `chapter03.md` ...
+- md 파일 : README.md
+  - 예) `chapter01/README.md`, `chapter02/README.md`, `chapter03/README.md` ...
 - 코드 업로드 파일 : 자유
 
 #### 경로 규칙
@@ -48,12 +48,12 @@
 
 ```bash
 # 아래 경로에 맞춰서 올려주세요! 
-/src/main/kotlin/action/{last-name}/{chapter-number}/{chapter-number}.md
+/src/main/kotlin/action/{last-name}/{chapter-number}/README.md
 
 # 예시
-/src/main/kotlin/action/jaeeun/chapter02/chapter02.md
-/src/main/kotlin/action/jaeeun/chapter03/chapter03.md
-/src/main/kotlin/action/jaeeun/chapter04/chapter04.md
+/src/main/kotlin/action/jaeeun/chapter02/README.md
+/src/main/kotlin/action/jaeeun/chapter03/README.md
+/src/main/kotlin/action/jaeeun/chapter04/README.md
 ```
 
 #### 커밋 메시지 컨벤션
