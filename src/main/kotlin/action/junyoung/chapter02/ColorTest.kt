@@ -1,4 +1,4 @@
-package action.chapter02
+package action.junyoung.chapter02
 
 import action.chapter02.Color.*
 import java.lang.IllegalArgumentException

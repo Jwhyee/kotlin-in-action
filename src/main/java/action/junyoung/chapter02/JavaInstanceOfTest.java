@@ -1,4 +1,4 @@
-package action.chapter02;
+package action.junyoung.chapter02;
 
 public class JavaInstanceOfTest {
     public static void main(String[] args) {

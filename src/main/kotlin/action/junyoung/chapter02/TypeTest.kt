@@ -1,4 +1,4 @@
-package action.chapter02
+package action.junyoung.chapter02
 
 fun main(args: Array<String>) {
     val person = Person("Bob", true)
