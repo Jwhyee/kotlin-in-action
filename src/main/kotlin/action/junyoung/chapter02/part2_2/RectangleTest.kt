@@ -1,4 +1,4 @@
-package action.junyoung.chapter02
+package action.junyoung.chapter02.part2_2
 
 fun main() {
     val rect = Rectangle(100, 200)

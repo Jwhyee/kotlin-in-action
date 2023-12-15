@@ -1,6 +1,6 @@
-package action.junyoung.chapter02
+package action.junyoung.chapter02.part2_3
 
-import action.chapter02.Color.*
+import action.junyoung.chapter02.part2_3.Color.*
 import java.lang.IllegalArgumentException
 
 fun main() {

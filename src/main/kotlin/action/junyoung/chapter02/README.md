@@ -784,3 +784,96 @@ println("Kotlin" in setOf("Java", "Scala"))
 문자열은 해당 범위에 있는 모든 문자열을 이터레이션을 할 수는 없지만, `in` 연산자를 사용하면 값이 범위 안에 속하는지 확인할 수 있다.
 
 ## 예외 처리
+
+코틀린의 예외(exception) 처리는 자바나 다른 언어의 예외 처리와 비슷하다.
+하지만 자바와는 다르게 인스턴스를 생성할 때 `new` 키워드를 붙이지 않으며, 예외 처리도 동일하다.
+
+```kotlin
+fun checkPercentage(percentage: Int) {
+    if (percentage !in 0..100) {
+        throw IllegalArgumentException(
+            "A percentage value must be between 0 and 100 : $percentage"
+        )
+    }
+}
+```
+
+또한, `throw`는 식(Expression)아므로, 다른 식에 포함될 수도 있다.
+
+```kotlin
+val percentage = if (number in 0..100) number else {
+    throw IllegalArgumentException(
+          "A percentage value must be between 0 and 100 : $number"
+    )
+}
+```
+
+자바와 마찬가지로 예외를 처리하려면, `try`, `finally` 절을 함께 사용한다.
+아래 코드는 파일에서 각 줄을 읽어 수로 변환하되, 그 줄이 올바른 수의 형태가 아니면, `null`을 반환하는 자바 및 코틀린 코드이다.
+
+```java
+public Integer readNumber(BufferedReader reader) throws IOException {
+    try {
+        final String line = reader.readLine();
+        return Integer.parseInt(line);
+    } catch (NumberFormatException e) {
+        return null;
+    } finally {
+        reader.close();
+    }
+}
+```
+
+우선 자바에서는 함수를 작성할 때 체크 예외에 대한 예외를 함수 뒤에 붙여야 한다.
+
+> 체크 예외(checked exception)이란, `Runtime Exception`을 상속 받지 않은 예외 클래스들이다.
+
+`readLine()` 함수를 살펴보면 `IOException`을 체크 예외로 던지고 있다.
+그렇기에 이를 사용하는 함수에서는 이에 대한 `try-catch`문을 작성하거나, 다른 메소드에서 처리할 수 있도록 `throws`를 할 수 있다.
+
+```java
+public String readLine() throws IOException {
+    return readLine(false, null);
+}
+```
+
+이처럼 자바에서는 체크 예외를 명시적으로 해야한다.
+그렇다면 코틀린의 코드는 어떨지 한 번 확인해보자.
+
+```kotlin
+// 함수가 던질 수 있는 예외를 명시할 필요가 없다.
+fun readNumber(reader: BufferedReader): Int? {
+    try {
+        val line = reader.readLine()
+        return Integer.parseInt(line)
+    } catch (e: NumberFormatException) {
+        return null
+    } finally {
+        reader.close()
+    }
+}
+```
+
+자바와 동일한 코드이고, `readLine()` 함수를 사용했음에도 `throws` 절이 없다.
+그 이유는 다른 최신 JVM 언어와 마찬가지로 코틀린도 체크 예외와 언체크 예외(Unchecked Exception)을 구분하지 않는다.
+함수가 던지는 예외를 지정하지 않고, 발생한 예외를 잡든 말던 신경쓰지 않는다.
+
+자바에서는 예외 처리를 강제하기 때문에 다시 예외를 다른 곳에 던지거나, 예외를 잡되 처리하지는 않고 무시하는 코드를 작성하기 때문에 예외 처리 규칙이 실제로는 오류 발생을 방지하지 못하는 경우가 많다.
+따라서 실제 프로그래머들이 체크 예외를 사용하는 방식을 고려해 이렇게 설계했다.
+
+이번에는 위 코드에서 `finally` 절을 제거하고, 파일에서 읽은 수를 출력하는 코드를 작성해보자.
+
+```kotlin
+fun readNumberAndPrint(reader: BufferedReader) {
+    val number = try {
+        Integer.parseInt(reader.readLine())
+    } catch (e: NumberFormatException) {
+        return
+    }
+    println(number)
+}
+```
+
+위 코드가 진행되면서 만약 수가 아닌 다른 문자가 올 경우, `return`을 만나 함수가 바로 종료되게 된다.
+하지만 계속 진행하도록 만든 뒤, 출력 값을 보려면 `return`이 아닌 `null`로 수정하면 된다. 
+`try` 코드 블록의 실행이 끝나면 결국 `println(number)`가 무조건 실행되게 된다.

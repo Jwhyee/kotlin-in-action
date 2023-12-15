@@ -1,4 +1,6 @@
-package action.junyoung.chapter02
+package action.junyoung.chapter02.part2_1
+
+import action.junyoung.chapter02.part2_2.Person
 
 fun main(args: Array<String>) {
     val person = Person("Bob", true)

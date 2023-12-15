@@ -1,4 +1,4 @@
-package action.junyoung.chapter02
+package action.junyoung.chapter02.part2_3
 
 enum class Color (
     val r: Int,

@@ -1,4 +1,4 @@
-package action.junyoung.chapter02
+package action.junyoung.chapter02.part2_4
 
 fun isLetter(c: Char) = c in 'a'..'z' || c in 'A'..'Z'
 fun isNotDigit(c: Char) = c !in '0'..'9'
