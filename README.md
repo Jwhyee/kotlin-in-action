@@ -5,11 +5,15 @@
           <thead>
               <tr>
                   <th><a href="https://github.com/Jaeeun1083">박재은</a></th>
+                  <th><a href="https://github.com/Jwhyee">가준영</a></th>
+                  <th><a href="https://github.com/dalcon10028">이연권</a></th>
               </tr>
           </thead>
           <tbody>
               <tr>
                   <td><img src="https://avatars.githubusercontent.com/u/78838791?v=4" width="120" height="120"/></td>
+                  <td><img src="https://avatars.githubusercontent.com/u/82663161?v=4" width="120" height="120"/></td>
+                  <td><img src="https://avatars.githubusercontent.com/u/30119526?v=4" width="120" height="120"/></td>
               </tr>
           </tbody>
       </table>
@@ -21,7 +25,10 @@
 
 ### [스터디 진행 방식]
 
-- 스터디는 매주 1회 진행합니다.
+- 스터디는 매주 1회 **일요일 4시** 진행합니다.
+- 해당 주차에 대해 학습 중 추가로 논의하고 싶거나 모르는 내용에 대해 자유롭게 해당 챕터의 label을 붙여 issue 를 올립니다.
+  - 올라온 issue에 대해서는 모든 팀원이 답글을 달아야합니다.
+  - 해결된 issue에 대해서는 해결되었다고 생각할 경우 올린 사람이 close 합니다.
 - 해당 주에는 대략 한 챕터씩 진행할 예정이며 내용에 따라 전 주에 조정합니다.
 
 ### [공부 내용 정리 방식]
@@ -32,8 +39,8 @@
 ### [업로드 규칙]
 
 #### 네이밍 규칙
-- md 파일 : chapter + 번호
-  - 예) `chapter01.md`, `chapter02.md`, `chapter03.md` ...
+- md 파일 : README.md
+  - 예) `chapter01/README.md`, `chapter02/README.md`, `chapter03/README.md` ...
 - 코드 업로드 파일 : 자유
 
 #### 경로 규칙
@@ -41,12 +48,12 @@
 
 ```bash
 # 아래 경로에 맞춰서 올려주세요! 
-/src/main/kotlin/action/{last-name}/{chapter-number}/{chapter-number}.md
+/src/main/kotlin/action/{last-name}/{chapter-number}/README.md
 
 # 예시
-/src/main/kotlin/action/jaeeun/chapter02/chapter02.md
-/src/main/kotlin/action/jaeeun/chapter03/chapter03.md
-/src/main/kotlin/action/jaeeun/chapter04/chapter04.md
+/src/main/kotlin/action/jaeeun/chapter02/README.md
+/src/main/kotlin/action/jaeeun/chapter03/README.md
+/src/main/kotlin/action/jaeeun/chapter04/README.md
 ```
 
 #### 커밋 메시지 컨벤션
