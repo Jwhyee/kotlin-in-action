@@ -337,6 +337,19 @@ fun readNumber(reader: BufferedReader) : Int? {
 }
 ```
 
+`throw`는 코틀린의 표현식이므로 Elvis 표현식의 일부로 사용할 수 있다.
+```kotlin
+val s = person.name ?: throw IllegalArgumentException("Name required")
+```
+
+throw 표현식의 유형은 `Nothing`이다. 
+이 유형에는 값이 없으며 자신의 코드에서 Nothing를 사용하여 반환하지 않는 함수를 표시할 수 있다.
+```kotlin
+fun fail(message: String): Nothing {
+    throw IllegalArgumentException(message)
+}
+```
+
 #### 2.5.2 try를 식으로 사용
 
 ```kotlin
