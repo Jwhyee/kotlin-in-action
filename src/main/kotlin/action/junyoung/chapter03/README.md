@@ -366,11 +366,6 @@ val c = "Kotlin".last()
 
 </center>
 
-```kotlin
-// 잘못된 사용
-val c = "Kotlin".action.chapter03.part3.lastChar()
-```
-
 #### 확장 함수로 유틸리티 함수 정의
 
 앞서 정의했던 `joinToString()`을 확장 함수로 변경해보자.
@@ -470,7 +465,7 @@ fun main() {
 ##### open 키워드
 
 > `open` 키워드를 사용하지 않을 경우 기본적으로 `final class`로 디컴파일 되는 것을 볼 수 있다.
-> `final` 클래스는 상속이 불가능하므로, `open` 키워드를 붙여 일반적인 `class`로 디컴파일 되도록 만들어주자.
+> `final` 클래스는 상속이 불가능하므로, `open` 키워드를 붙여 일반적인 `class`로 디컴파일 되도록 만들어 준다.
 
 ```java
 // open을 붙이지 않았을 경우
@@ -496,8 +491,14 @@ public class View {
 클래스의 상속, 구현은 ` : `를 사용하며, 변수 및 함수의 리턴 타입은 `: `를 사용한다.
 
 ```kotlin
-object EmptyDeclarationProcessor : DeclarationProcessor() { /*...*/ }
-class FooImpl : Foo { /*...*/ }
+abstract class Foo<out T : Any> : IFoo {
+    abstract fun foo(a: Int): T
+}
+
+class FooImpl : Foo() {
+    constructor(x: String) : this(x) { /*...*/ }
+    val x = object : IFoo { /*...*/ }
+}
 
 val mutableCollection: MutableSet<String> = HashSet()
 ```
