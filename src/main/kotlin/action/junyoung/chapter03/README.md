@@ -371,5 +371,489 @@ val c = "Kotlin".last()
 val c = "Kotlin".action.chapter03.part3.lastChar()
 ```
 
+#### 확장 함수로 유틸리티 함수 정의
+
+앞서 정의했던 `joinToString()`을 확장 함수로 변경해보자.
+
+```kotlin
+fun <T> Collection<T>.joinToString(
+    separator: String = ", ",
+    prefix: String = "",
+    postfix: String = ""
+): String {
+    val result = StringBuilder(prefix)
+    for ((idx, element) in this.withIndex()) {
+        if (idx > 0) result.append(separator)
+        result.append(element)
+    }
+    result.append(postfix)
+    return result.toString()
+}
+```
+
+매개변수로 받던 `Collection` 정보를 수신 객체 타입으로 변경해주고, 수신 객체는 `this`로 변경해주자.
+
+```kotlin
+// 출력 : 1, 7, 53
+val list = arrayListOf(1, 7, 53)
+println(list.joinToString(", "))
+```
+
+확장 함수는 단지 정적 메소드 호출에 대한 문법적인 편의(syntatic sugar)일 뿐이다.
+그래서 클래스가 아닌 더 구체적인 타입을 수신 객체 타입으로 지정할 수도 있다.
+
+```kotlin
+fun Collection<String>.join(
+    separator: String = ", ",
+    prefix: String = "",
+    postfix: String = ""
+) = joinToString(separator, prefix, postfix)
+
+// 출력 : One, Two, Eight
+val strList = arrayListOf("One", "Two", "Eight")
+println("join =  ${strList.join()}")
+```
+
+위와 같이 작성하면 문자열 컬렉션에 대해서만 호출할 수 있게 된다.
+
+#### 확장 함수는 오버라이드할 수 없다.
+
+확장 함수가 정적 메소드와 같은 특징을 가지므로, 확장 함수를 하위 클래스에서 오버라이드할 수는 없다.
+아래 `View`와 그 하위 클래스인 `Button`에 대한 예시를 통해 확인해보자.
+
+```kotlin
+open class View {
+    open fun click() = println("View clicked")
+}
+
+class Button : View() {
+    override fun click() = println("Button clicked")
+}
+
+fun main() {
+    // 출력 : Button clicked
+    val view: View = Button()
+    view.click()
+}
+```
+
+버튼은 뷰의 하위 타입이므로, 상위 클래스의 함수를 상속 받아 재구현할 수 있다.
+때문에 객체 타입이 `View`라고 하더라도, 실제 타입을 `Button`으로 생성할 경우 **Button clicked**가 출력되는 것을 볼 수 있다.
+
+> 시행 시점에 객체 타입에 따라 동적으로 호출될 대상 메소드를 결정하는 방식을 동적 디스패치(dynamic dispatch)라고 부른다.
+> 반대로 컴파일 시점에 알려진 변수 타입에 따라 정해진 메소드를 호출하는 방식은 정적 디스패치(static dispatch)라고 부른다.
+> 프로그래밍 언어 용어에서 **정적**이라는 말은 **컴파일 시점**을 의미하고, **동적**이라는 말은 **실행 시점**을 의미한다.
+
+이번에는 확장 함수를 적용해보자.
+
+```kotlin
+fun View.showOff() = println("I'm View!")
+fun Button.showOff() = println("I'm Button!")
+
+fun main() {
+    val view: View = Button()
+    
+    // 출력 : Button clicked
+    view.click()
+    // 출력 : I'm View!
+    view.showOff()
+}
+```
+
+실제 객체는 `Button`이지만 `View`에 대한 문구가 출력되는 것을 알 수 있다.
+이름과 파라미터가 완전이 같은 확장 함수를 기반 클래스와 하위 클래스에 대해 정의하더라도,
+**실제로는 확장 함수를 호출할 때, 수신 객체로 지정한 변수의 정적 타입에 의해 어떤 확장 함수가 호출될지 결정된다.
+즉, 그 변수에 저장된 객체의 동적인 타입에 의해 확장 함수가 결정되지 않는다.**
+
+> 어떤 클래스를 확장한 함수와 그 클래스의 멤버 함수의 이름가 같을 경우 멤버 함수가 호출된다.(멤버 함수의 우선 순위가 더 높다.)
+
+##### open 키워드
+
+> `open` 키워드를 사용하지 않을 경우 기본적으로 `final class`로 디컴파일 되는 것을 볼 수 있다.
+> `final` 클래스는 상속이 불가능하므로, `open` 키워드를 붙여 일반적인 `class`로 디컴파일 되도록 만들어주자.
+
+```java
+// open을 붙이지 않았을 경우
+public final class View {
+    public final void click() {
+        String var1 = "View clicked";
+        System.out.println(var1);
+    }
+}
+
+// open을 붙일 경우
+public class View {
+    public void click() {
+        String var1 = "View clicked";
+        System.out.println(var1);
+    }
+}
+```
+
+##### 콜론(:) 컨벤션
+
+코틀린 [공식 문서](https://kotlinlang.org/docs/coding-conventions.html#colon)에 나와있듯,
+클래스의 상속, 구현은 ` : `를 사용하며, 변수 및 함수의 리턴 타입은 `: `를 사용한다.
+
+```kotlin
+object EmptyDeclarationProcessor : DeclarationProcessor() { /*...*/ }
+class FooImpl : Foo { /*...*/ }
+
+val mutableCollection: MutableSet<String> = HashSet()
+```
+
 ### 확장 프로퍼티
 
+확장 프로퍼티를 사용하면, 기존 클래스 객체에 대한 프로퍼티 형식의 구문으로 사용할 수 있는 API를 추가할 수 있다.
+
+```kotlin
+val String.lastChar: Char
+    get() = get(length - 1)
+```
+
+> `get()`을 사용해 프로퍼티라는 이름으로 불리기는 하지만, 상태를 저장할 적절한 방법이 없다.
+(기존 클래스의 인스턴스 객체에 필드를 추가할 방법은 없다.)
+때문에 실제로 확장 프로퍼티는 아무 상태도 가질 수 없다.
+
+뒷받침하는 필드(backing field)가 없어서 기본 게터 구현을 제공할 수 없으므로, 최소한 게터는 꼭 정의를 해야 한다.
+마찬가지로 계산한 값을 담을 장소가 없으므로, 초기화 코드도 쓸 수 없다.
+
+```kotlin
+var StringBuilder.lastChar: Char
+    get() = get(length - 1)
+    set(value) {
+        this.setCharAt(length - 1, value)
+    }
+```
+
+```kotlin
+// 출력 : n
+println("Kotlin".lastChar)
+
+val sb = StringBuilder("Kotlin?")
+sb.lastChar = '!'
+
+// 출력 : Kotlin!
+println(sb.toString())
+// 출력 : !
+println(sb.lastChar)
+```
+
+자바에서 확장 프로퍼티를 사용하고 싶다면, 항상 `get`, `set`을 붙여 함수를 호출해야 한다.
+
+## 4. 컬렉션 처리
+
+이 주제에서는 다음과 같은 코틀린 언어 특성을 설명한다.
+
+- `vararg` 키워드를 사용하면 호출 시 인자 개수가 달라질 수 있는 함수를 정의할 수 있다.
+- 중위(infix) 함수 호출 구문을 사용하면, 인자가 하나뿐인 메소드를 간편하게 호출할 수 있다.
+- 구조 분해 선언(destructuring declaration)을 사용하면 복합적인 값을 분해해서 여러 변수에 나눠 담을 수 있다.
+
+### 자바 컬렉션 API 확장
+
+코틀린 컬렉션은 자바와 같은 클래스를 사용하지만, 더 확장된 API를 제공한다.
+
+```kotlin
+fun main() {
+    val strings = listOf("first", "second", "fourteenth")
+    println(strings.last())
+
+    val numbers = setOf(1, 14, 2)
+    println(numbers.max())
+}
+```
+
+위에서 사용하는 함수들을 타고 들어가면, 자바 클래스가 아닌 코틀린 파일로 된 것을 볼 수 있다.
+그런데 어떻게 자바 라이브러리 클래스의 인스턴스인 컬렉션에 대해 코틀린이 새로운 기능을 추가할 수 있을까?
+
+실제 구현 코드를 보면 답을 알 수 있다.
+
+```kotlin
+public fun <T> List<T>.last(): T {
+    if (isEmpty())
+        throw NoSuchElementException("List is empty.")
+    return this[lastIndex]
+}
+
+@Deprecated("Use maxOrNull instead.", ReplaceWith("this.maxOrNull()"))
+@DeprecatedSinceKotlin(warningSince = "1.4", errorSince = "1.5", hiddenSince = "1.6")
+@Suppress("CONFLICTING_OVERLOADS")
+public fun <T : Comparable<T>> Iterable<T>.max(): T? {
+    return maxOrNull()
+}
+
+@SinceKotlin("1.4")
+public fun <T : Comparable<T>> Iterable<T>.maxOrNull(): T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var max = iterator.next()
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (max < e) max = e
+    }
+    return max
+}
+```
+
+> `max()`는 어노테이션으로 나와있는 것처럼 1.4 버전에서는 경고를 띄워주고, 1.5 버전에서는 에러가 발생하며, 1.6 버전부터 완전히 deprecated 되었다.
+> 때문에 해당 함수를 사용해야할 경우 `maxOrNull()`을 사용해야 한다.
+
+두 함수 모두 확장 함수로 되어있기 때문에 가능한 것이다.
+
+### 가변 인자 함수 : 인자의 개수가 달라질 수 있는 함수 정의
+
+```kotlin
+val list = listOf(2, 3, 5, 7, 11)
+```
+
+위와 같이 여러 인자를 받는 `listOf()`는 내부 코드를 보면 알 수 있듯 가변 인자를 사용한다.
+
+```kotlin
+public fun <T> listOf(vararg elements: T): List<T> = /*...*/
+```
+
+자바의 가변 길이 인자는 메소드를 호출할 때 원하는 개수만큼 값을 인자로 넘기면 자바 컴파일러가 배열에 그 값들을 넣어준다.
+코틀린의 경우 비슷하지만 자바에서 사용하는 `...`이 아닌 `vararg` 변경자를 붙인다.
+
+이미 배열에 들어있는 원소를 가변 길이 인자로 넘길 때도 코틀린과 자바 구문이 다르다.
+
+```kotlin
+fun main() {
+    val args = arrayOf("First", "Second", "Third")
+    val argList = listOf("args: ", *args)
+
+    println(argList)
+}
+```
+
+위 코드에서 보이는 `*`은 스프레드(spread) 연산자라고 부르며, 데이터를 나열할 때 사용한다.
+
+### 값의 쌍 다루기 : 중위 호출과 구조 분해 선언
+
+```kotlin
+val map = mapOf(1 to "One", 7 to "Seven", 53 to "fifty-three")
+```
+
+위 코드를 보면 `to`라는 키워드를 사용했는데, 이는 중위 호출(infix call)을 통해 일반 메소드를 호출한 것이다.
+
+```kotlin
+public infix fun <A, B> A.to(that: B): Pair<A, B> = Pair(this, that)
+```
+
+중위 호출 시에는 수신 객체와 유일한 메소드 인자 사이에 메소드 이름을 넣는다.
+이 때, 객체, 메소드 이름, 유일한 인자 사이에는 공백이 들어가야 한다.
+
+```kotlin
+1.to("One")
+1 to "One"
+```
+
+위 두 코드는 동일한 `to` 메소드를 호출하고 있는 것이며, 두 값을 즉시 변수로 초기화할 수 있다.
+
+```kotlin
+val (number, name) = 1 to "One"
+```
+
+이런 기능을 구조 분해 선언(destructuring declaration)이라고 부른다.
+
+<center>
+
+<img width="387" alt="스크린샷 2023-12-23 오후 6 53 08" src="https://github.com/Jaeeun1083/kotlin_in_action/assets/82663161/2329a4be-eb61-4f05-ae01-eee5db2e300b">
+
+</center>
+
+`Pair` 인스턴스 외에도 구조 분해를 적용할 수 있다.
+
+```kotlin
+val map = mapOf(1 to "One", 7 to "Seven", 53 to "fifty-three")
+for ((key, value) in map.entries) {
+    println("${key} = ${value}")
+}
+```
+
+```kotlin
+val list = listOf(2, 3, 5, 7, 11)
+
+for ((index, element) in list.withIndex()) {
+    println("${index} = ${element}")
+}
+
+list.forEachIndexed { index, element ->
+    println("${index} = ${element}")
+}
+```
+
+## 5. 문자열과 정규식 다루기
+
+### 문자열 나누기
+
+[스택 오버플로우](https://stackoverflow.com/questions/14833008/java-string-split-with-dot)을 보면 아래와 코드 질문을 볼 수 있다.
+
+```java
+// Why does the second line of this code throw ArrayIndexOutOfBoundsException?
+String filename = "D:/some folder/001.docx";
+String extensionRemoved = filename.split(".")[0];
+```
+
+`split`의 구분 문자열은 실제로 정규식을 나타내는데, 표현식 중 마침표(.)는 모든 문자를 나타내는 식으로 해석된다.
+때문에 이를 잘 모르는 상태에서 사용하면 혼동이 생길 수 있다. 하지만 코틀린에서는 `split`의 확장 함수를 제공함으로써 혼동을 야기하는 메소드를 감춘다.
+
+```kotlin
+fun main() {
+    val str = "12.345-6.A"
+    // .과 -을 기준으로 문자열을 분리하는 정규식을 명시적으로 만든다.
+    println(str.split("\\.|-".toRegex()))
+}
+```
+
+하지만 정규식을 잘 모르는 상태에서 위와 같이 사용하는 것은 어렵게 느껴진다.
+이를 위해, `split` 확장 함수를 오버로딩한 다른 버전을 사용하면 된다.
+
+```kotlin
+println(str.split(".", "-"))
+```
+
+자바에서는 무조건 하나의 인자만 받을 수 있지만, 코틀린에서는 `vararg`를 사용해 여러 표현식을 쉽게 적용할 수 있다.
+
+### 정규식과 3중 따옴표로 묶은 문자열
+
+파일 경로 중, 디렉터리, 파일 이름, 확장자로 구분하는 코드를 작성해보자.
+
+```kotlin
+fun main() {
+    val path = "/users/yole/kotlin-book/chapter.adoc"
+    parsePath(path)
+}
+
+fun parsePath(path: String) {
+    val directory = path.substringBeforeLast("/")
+    val fullName = path.substringAfterLast("/")
+    val fileName = fullName.substringBeforeLast(".")
+    val extension = fullName.substringAfterLast(".")
+
+    // 출력 : dir : /users/yole/kotlin-book, name : chapter, ext : adoc
+    println("dir : ${directory}, name : ${fileName}, ext : ${extension}")
+}
+```
+
+- substringBeforeLast : 가장 마지막 `/` 전까지 문자열을 잘라서 가져옴
+- substringAfterLast : 가장 마지막 `/` 이후의 문자열을 잘라서 가져옴
+
+`MatchResult`를 사용하면 더 편하게 이용할 수 있다.
+
+```kotlin
+fun parsePathVer2(path: String) {
+    val regex = """(.+)/(.+)\.(.+)""".toRegex()
+    val mathResult = regex.matchEntire(path)
+    if (mathResult != null) {
+        val (dir, name, ext) = mathResult.destructured
+        println("dir : ${dir}, name : ${name}, ext : ${ext}")
+    }
+}
+```
+
+3중 따옴표 문자열에서는 역슬래쉬(\)를 포함한 어떤 문자도 이스케이프할 필요도 없다.
+
+<center>
+
+<img width="334" alt="image" src="https://github.com/Jwhyee/Jwhyee.github.io/assets/82663161/22b92a3c-e9ed-4417-a043-7087684bf09e">
+
+</center>
+
+#### 여러 줄 3중 따옴표 문자열
+
+ASCII 아트를 이용한 코틀린 로고를 출력해보자.
+
+```kotlin
+val kotlinLogo = """| //
+                    | //
+                    |/ \"""
+println(kotlinLogo)
+```
+
+```
+| //
+                         | //
+                         |/ \
+```
+
+3중 따옴표 문자열을 사용하면, 들여쓰기나, 줄 바꿈을 포함한 모든 문자가 들어간다.
+
+```kotlin
+val kotlinLogo = """| //
+                   .| //
+                   .|/ \"""
+println(kotlinLogo.trimMargin("."))
+```
+
+의미없는 들여쓰기를 지우기 위해서는 들여쓰기 끝에 특별한 문자열로 표시하고, `trimMargin()`을 사용해 그 직전의 공백을 제거할 수 있다.
+
+## 6. 코드 다듬기 : 로컬 함수와 확장
+
+많은 개발자들이 좋은 코드의 중요한 특징 중 하나가 중복이 없는 것이라 믿는다.
+그래서 그 원칙에는 반복하지 말라(DRY; Don't Repeat Yourself)라는 이름도 있다.
+
+많은 경우 메소드 추출(Extract Method) 리팩토링을 적용해서 긴 메소드를 부분부분 나눠 재활용하게 한다.
+하지만 이럴 경우 클래스 안에 작은 메소드가 많아지고, 메소드 사이의 관계를 파악하기 힘들어서 코드를 이해하기 더 어려워질 수 있다.
+
+### 로컬 함수
+
+코틀린에는 앞서 제기한 문제를 해결하기 위한 깔끔한 해법이 있다.
+
+```kotlin
+class User(val id: Int, val name: String, val address: String)
+
+fun saveUser(user: User) {
+    if (user.name.isEmpty()) {
+        throw IllegalArgumentException(
+            "Can't save user ${user.id} : empty name"
+        )
+    }
+    if (user.address.isEmpty()) {
+        throw IllegalArgumentException(
+            "Can't save user ${user.id} : empty address"
+        )
+    }
+    save(user)
+}
+```
+
+위 코드에서 중복이 많지는 않지만, 필드를 검증하는 메소드가 중복되고 있다.
+이런 경우 검증 코드를 로컬 함수로 분리하면 중복을 없애는 동시에 코드 구조를 깔끔하게 유지할 수 있다.
+
+```kotlin
+fun saveUser(user: User) {
+    fun validate(value: String, fieldName: String) {
+        if (value.isEmpty()) {
+            // 바깥 함수 파라미터에 직접 접근할 수 있다.
+            throw IllegalArgumentException(
+                "Can't save user ${user.id} : empty $fieldName"
+            )
+        }
+    }
+    validate(user.name, "Name")
+    validate(user.address, "Address")
+
+    save(user)
+}
+```
+
+이를 확장 함수로 만들면 다음과 같이 작성할 수 있다.
+
+```kotlin
+fun User.validateBeforeSave() {
+    fun validate(value: String, fieldName: String) {
+        if (value.isEmpty()) {
+            throw IllegalArgumentException(
+                "Can't save user $id : empty $fieldName"
+            )
+        }
+    }
+    
+    validate(name, "Name")
+    validate(address, "Address")
+}
+```
+
+이미 수신 객체를 `User`로 정의했기 때문에 `this.id`가 아닌 `id`로 바로 필드에 접근이 가능하다.
+`Spring` 기준으로 `validate` 함수는 `UserService` 내부에 따로 정의할 수 있지만, 다른 곳에서는 쓰일 일이 없기 때문에 로컬 함수로 사용하면 좋다.
