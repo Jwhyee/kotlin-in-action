@@ -303,6 +303,8 @@ const val UNIX_LINE_SEPARATOR = "\n"
 public static final String UNIX_LINE_SEPARATOR = "\n";
 ```
 
+> `const`를 붙이지 않을 경우 `private static final`로 선언된다.
+
 ## 3. 메소드를 다른 클래스에 추가
 
 기존 코드와 코틀린 코드를 자연스럽게 통합하는 것은 코틀린의 핵심 목표 중 하나이다.
