@@ -8,6 +8,7 @@
                   <th><a href="https://github.com/Jwhyee">가준영</a></th>
                   <th><a href="https://github.com/dalcon10028">이연권</a></th>
                   <th><a href="https://github.com/hankkuu">한규</a></th>
+                  <th><a href="https://github.com/gz-dori">원준</a></th>
               </tr>
           </thead>
           <tbody>
@@ -16,6 +17,7 @@
                   <td><img src="https://avatars.githubusercontent.com/u/82663161?v=4" width="120" height="120"/></td>
                   <td><img src="https://avatars.githubusercontent.com/u/30119526?v=4" width="120" height="120"/></td>
                   <td><img src="https://avatars.githubusercontent.com/u/7829802?v=4" width="120" height="120"/></td>
+                <td><img src="https://avatars.githubusercontent.com/u/112324735?v=4" width="120" height="120"/></td>
               </tr>
           </tbody>
       </table>
