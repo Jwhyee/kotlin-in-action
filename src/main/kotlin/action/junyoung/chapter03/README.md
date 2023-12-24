@@ -290,7 +290,7 @@ fun reportOperationCount() {
 - val : getter
 - var : getter, setter
 
-더 자연스럽게 사용하려면 이 상수를 `public static final` 필드로 컴파일해야 한다.
+이 상수를 더 자연스럽게 사용하려면 `public static final` 필드로 컴파일해야 한다.
 이럴 경우 `const`를 사용하면 위 필드로 컴파일하게 만들 수 있다.
 단, 원시 타입과 String 타입의 프로퍼티만 지정할 수 있다.
 
