@@ -49,7 +49,9 @@ fun findTheOldest(people: List<Person>) {
 
 ```kotlin
 fun main() {  
-	val people = listOf(Person("Alice", 29), Person("Sponge", 52), Person("Bob", 97))  
+	val people = listOf(
+		Person("Alice", 29), Person("Sponge", 52), Person("Bob", 97)
+	)
 	println(people.maxBy { it.age })  
 }
 ```
@@ -167,6 +169,8 @@ public class CollectionTestJava {
 
 자바 8에서만 사용 불가능하며, 이후 자바 버전에서는 `final`이 아닌 변수에 접근할 수 있다.
 
+---
+
 다시 본론으로 돌아와 아래 코드는 람다 안에서 바깥 함수의 로컬 변수를 변경하는 코드이다.
 
 ```kotlin
@@ -181,7 +185,7 @@ fun printProblemCounts(response: Collection<String>) {
 }
 ```
 
-이렇게 람다 안에서 사용하는 외부 변수를 '람다가 포획(capture)한 변수'라고 부른다. 함수를 쓸모 있는 일급 시민으로 만드려면 포획한 변수를 제대로 처리해야 하고, 포획한 변수를 제대로 처리하려면 클로저(closure)가 꼭 필요하다. 그래서 람다를 클로저라고도 부른다.
+이렇게 람다 안에서 사용하는 외부 변수를 '**람다가 포획(capture)한 변수**'라고 부른다. 함수를 쓸모 있는 일급 시민으로 만드려면 포획한 변수를 제대로 처리해야 하고, 포획한 변수를 제대로 처리하려면 클로저(closure)가 꼭 필요하다. 그래서 람다를 클로저라고도 부른다.
 
 > 클로저란, 람다에서 시작하는 모든 참조가 포함된 닫힌(closed) 객체 그래프를 코드와 함께 저장하는 데이터 구조를 의미한다.
 
@@ -230,7 +234,7 @@ fun sendEmail(p: Person, msg: String) {
 
 fun main() {
 	val personConstructor = ::Person  
-	action(personConstructor("전청조", 28), "나 전청조인데 개추")
+	action(personConstructor("전청조", 28), "나 전청조인데 개추 눌렀다.")
 }
 ```
 
@@ -386,8 +390,6 @@ val list = people.asSequence()
 
 시퀀스의 강점은 원소를 필요할 때 비로소 계산되어 중간 처리 결과를 저장하지 않고도 연산을 연쇄적으로 적용해서 효율적으로 계산을 수행할 수 있다. 즉, 위 코드는 연산 과정만 등록을 해놓은 상태이며, 실질적인 연산은 list를 사용하는 시점에 적용된다.
 
-> 의문점 : 위 코드를 사용할 때마다 연산되는 것이라면, 일반 함수에 비해 덜 효율적인게 아닌가?!
-
 ### 3-1. 시퀀스 연산 실행 : 중간 연산과 최종 연산
 
 시퀀스에 대한 연산은 중간(intermediate) 연산과 최종(terminal) 연산으로 나뉜다. 중간 연산은 다른 시퀀스를 반환하며, 해당 시퀀스는 최초 시퀀스의 원소를 변환하는 방법을 안다. 최종 연산은 결과를 반환한다.
@@ -453,7 +455,7 @@ fun main() {
 
 ## 4. 자바 함수형 인터페이스 활용
 
-코틀린에서 사용하는 API 중 상당수는 자바로 작성된 API일 가능성이 높다. 두 언어는 호환되기 때문에 코틀린 람드를 자바 API에 사용해도 아무 문제가 없다.
+코틀린에서 사용하는 API 중 상당수는 자바로 작성된 API일 가능성이 높다. 두 언어는 호환되기 때문에 코틀린 람다를 자바 API에 사용해도 아무 문제가 없다.
 
 가장 첫 부분에서 봤듯이, 자바 8 이전에는 `setOnclickListener` 메소드에게 인자로 넘기기 위해 무명 클래스의 인스턴스를 만들어 사용했다.
 
@@ -482,7 +484,10 @@ button.setOnClickListener(view -> doSomething(view))
 
 ```java
 public class FunctionalTestJava {  
-	public static void postponeComputation(int delay, Runnable computation) throws InterruptedException {  
+	public static void postponeComputation(
+		int delay, 
+		Runnable computation
+	) throws InterruptedException {  
 		Thread.sleep(delay);  
 		computation.run();  
 	}  
@@ -525,22 +530,7 @@ fun main() {
 }
 ```
 
-SAM 생성자는 그 함수형 인터페이스의 유일한 추상 메소드의 본문에 사용할 람다만을 인자로 받아 함수형 인터페이스를 구현하는 클래스의 인스턴스를 반환한다. 디컴파일하면 다음과 같다.
-
-```java
-```kotlin
-fun createAllDoneRunnable(): Runnable {  
-	return Runnable { println("All done!") }  
-}  
-  
-fun main() {    
-	createAllDoneRunnable().run()  
-}
-```
-
 SAM 생성자는 그 함수형 인터페이스의 유일한 추상 메소드의 본문에 사용할 람다만을 인자로 받아 함수형 인터페이스를 구현하는 클래스의 인스턴스를 반환한다.
-
-> SAM 생성자에 대해 이해하지 못함
 
 ## 5. 수신 객체 지정 람다 : with와 apply
 
@@ -555,7 +545,7 @@ fun alphabet(): String {
 	val result = StringBuilder()  
 	  
 	for (letter in 'A'..'Z') {  
-	result.append(letter)  
+		result.append(letter)  
 	}  
 	  
 	result.append("\nNow I know the alphabet!")  
@@ -620,4 +610,3 @@ fun alphabet() = buildString {
 	append("\nNow I know the alphabet!")  
 }
 ```
-
