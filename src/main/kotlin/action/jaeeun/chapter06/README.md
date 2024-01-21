@@ -34,8 +34,6 @@ fun strLen(s: String?) : Int? = s?.length
                 --- foo != null ---> foo.strLen()
 foo?.strLen() -|
                 --- foo == null ---> null
-             
-             
 ```
 
 ### 6.1.4 엘비스 연산자 `?:`
@@ -98,7 +96,6 @@ lateinit은 주로 non-null 타입의 프로퍼티를 선언할 때 사용되며
 @SpringBootTest
 class Example {
 
-    @Autowired
     @Autowired lateinit var testHelper: TestHelper
 }
 ```
