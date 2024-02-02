@@ -7,7 +7,7 @@ import kotlin.jvm.functions.Function1;
 import java.util.ArrayList;
 import java.util.List;
 
-import static action.junyoung.chapter08.FunctionTestKt.processTheAnswer;
+import static action.junyoung.chapter08.part1.FunctionTestKt.processTheAnswer;
 
 public class JavaFunctionTest {
     public static void main(String[] args) {

@@ -1,6 +1,5 @@
-package action.junyoung.chapter08
+package action.junyoung.chapter08.part1
 
-import action.chapter03.part1.join
 import java.lang.StringBuilder
 
 //private val sum = { x: Int, y: Int -> x + y }
