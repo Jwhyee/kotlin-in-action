@@ -1,5 +1,6 @@
 # 8. 고차 함수; 파라미터와 반환 값으로 람다 사용
 
+
 고차 함수(high order function)를 사용하면 코드 중복을 없애고, 더 나은 추상화를 구축할 수 있다.
 
 ## 1. 고차 함수 정의
@@ -111,7 +112,7 @@ CollectionsKt.forEach(strings, s -> {
 });
 ```
 
-### 1-4. 타입 파라미터; 디폴트 값을 지정한 함수 / 널이 될 수 있는 함수
+### 1-4. 타입 파라미터 : 디폴트 값을 지정한 함수 / 널이 될 수 있는 함수
 
 이전에 구현한 joinToString은 특정 요소를 제어할 수 없다. 이를 위해 함수 파라미터에 함수를 받도록 하면, 매번 람다를 넘겨야하는 불편함이 생긴다. 이는, 해당 파라미터에 디폴트 값을 넣어서 해결할 수 있다.
 
@@ -206,7 +207,8 @@ fun main() {
 ```java
 public static final void main() {  
    Function1 calc = getShippingCostCalculator(Delivery.EXPEDITED);  
-   String var1 = "Shipping costs " + ((Number)calc.invoke(new Order(3))).doubleValue();  
+   String var1 = "Shipping costs " + 
+				((Number)calc.invoke(new Order(3))).doubleValue();  
    System.out.println(var1);  
 }
 ```
@@ -512,12 +514,7 @@ map 함수 또한 인라인 함수기 때문에 위와 같은 코드로 디컴�
 
 모든 함수를 인라인으로 만든다고 성능이 좋아지는 것은 아니다. 사용하더라도, 람다를 인자로 받는 함수만 성능이 좋아질 가능성이 높다.
 
-일반 함수의 경우 JVM에서 기계어 코드로 번역하는 JIT을 통해 가장 이익이 되는 방향으로 호출을 인라이닝한다.
-
-> - 이해 못함
-    > 이런 JVM의 최적화를 활용 한다면 바이트코드에서는 각 함수 구현이 정확히 한 번만 있으면 되고, 그 함수를 호출하 는 부분에서 따로 함수 코드를 중복할 필요가 없다. 반면 코틀린 인라인 함수는 바이트 코드에서 각 함수 호출 지점을 함수 본문으로 대치하기 때문에 코드 중복이 생긴다. 게다가 함수를 직접 호출하면 스택 트레이스가 더 깔끔해진다.
-
-람다를 인자로 받는 함수를 인라이닝할 경우 아래와 같은 부가 비용을 없앨 수 있다.
+일반 함수의 경우 JVM에서 기계어 코드로 번역하는 JIT을 통해 가장 이익이 되는 방향으로 호출을 인라이닝한다. 람다를 인자로 받는 함수를 인라이닝할 경우 아래와 같은 부가 비용을 없앨 수 있다.
 
 - 함수 호출 비용
 - 람다를 표현하는 클래스 및 람다 인스턴스에 해당하는 객체를 만들지 않을 수 있음
@@ -617,6 +614,57 @@ public inline fun <T : Closeable?, R> T.use(block: (T) -> R): R {
     }  
 }
 ```
+
+### 2-6. (추가) reified 키워드
+
+제네릭 타입은 런타임 시 타입이 소거가 된다. 때문에 런타임에 특정 제네릭의 타입을 알고 싶을 경우에는 다음과 같이 클래스 타입을 함수 인자에 넘겨 값을 필드에 저장하게 된다.
+
+```kotlin
+private class MyList<T : Any>(val type: KClass<T>)
+```
+
+이렇게 타입을 저장하면 런타임에도 해당 클래스 타입을 이용할 수 있게 된다. 만약 이런 식으로 클래스 타입을 넘겨주지 않고, `T::class`로 호출할 경우 다음과 같은 컴파일 에러가 발생한다.
+
+```kotlin
+private class MyList<T : Any> {  
+	fun getType() {  
+		// Cannot use 'T' as reified type parameter. Use a class instead.
+		// 'T'를 reified type 매개변수로 사용할 수 없습니다. 대신 클래스를 사용하십시오.
+		return T::class  
+	}  
+}
+```
+
+컴파일 에러 메시지에서 보이는 것처럼 `T` 자체를 `reified`로서 활용할 수 없다고 한다. 여기서 말하는 `reified`가 무엇인지 확인해보자.
+
+> 배열은 런타임에도 자신이 담기로 한 원소의 타입을 인지하고 확인한다. `Long[]`에 `String`을 넣으려고 하면 `ArrayStoreException` 에러가 발생한다.
+
+> 제네릭은 타입 정보가 런타임에 소거(erasure)된다. 원소 타입을 컴파일 타임에만 검사하며, 런타임에는 알수조차 없게 되는 것이다. 즉, 여기서 말하는 실체화란 타입의 정보가 런타임에도 계속 남아있느냐를 의미하는 것이다.
+
+위 두 내용은 Effective Java 3/E의 아이템28(배열보다는 리스트를 사용하라.)의 일부 내용이다. 정리해보면, 제네릭은 컴파일 타임에만 타입 정보를 들고 있으며, 런타임 시 타입 정보가 소거된다. 즉, 위에서 `T::class`를 사용할 수 없는 이유 또한 런타임 시 타입 정보가 사라지기 때문이다.
+
+만약 클래스일 경우 처음 예시와 같이 타입 정보를 함께 저장해줄 수 있지만, 함수를 사용할 경우 타입 정보까지 받기엔 부담스러울 수 있다.
+
+```kotlin
+inline fun <T: Any> printGenerics(value: T, type: KClass<T>) {  
+	println("${type} = ${value}")  
+}  
+  
+fun main() {  
+	printGenerics(2200000000, Long::class)  
+	printGenerics(2100000000, Int::class)
+}
+```
+
+이런 상황에서 `reified` 키워드를 사용할 경우 T의 타입 정보를 보관할 수 있다.
+
+```kotlin
+inline fun <reified T> printGenerics(value: T) {  
+	println("${T::class} = ${value}")  
+}
+```
+
+클래스의 경우 해당 타입 정보를 클래스 내부 프로퍼티에 저장하면 되기 때문에 대부분의 `reified` 키워드는 `inline` 함수와 함께 사용한다.
 
 ## 3. 고차 함수 안에서 흐름 제어
 
