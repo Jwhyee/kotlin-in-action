@@ -2,40 +2,6 @@ package action.junyoung.test
 
 import kotlin.reflect.full.memberProperties
 
-interface ChangeDetectable {
-    val field: String
-    val title: String
-    val t1: String
-    val t2: String
-}
-
-enum class PostField : ChangeDetectable {
-    C1 {
-        override val field = "title"
-        override val title = "제목"
-        override val t1 = ""
-        override val t2 = ""
-    },
-    C2 {
-        override val field = "content"
-        override val title = "내용"
-        override val t1 = ""
-        override val t2 = ""
-    },
-    C3 {
-        override val field = "isDeleted"
-        override val title = "삭제 여부"
-        override val t1 = "삭제됨"
-        override val t2 = "삭제되지 않음"
-    },
-    C4 {
-        override val field = "category"
-        override val title = "카테고리"
-        override val t1 = ""
-        override val t2 = ""
-    }
-}
-
 enum class PostCategory(val title: String) {
     C1("자유 게시판"), C2("정보 게시판");
 
@@ -44,89 +10,97 @@ enum class PostCategory(val title: String) {
     }
 }
 
-class Post() {
-    var title: String = ""
-    var content: String = ""
-    var isDeleted: Boolean = false
-    var category: PostCategory = PostCategory.C1
-}
+data class Member(
+    val username: String,
+    val password: String
+)
 
-enum class BasicFunctionName {
-    equals, hashCode, toString;
+class Post(
+    val title: String = "",
+    val content: String = "",
+    val isDeleted: Boolean = false,
+    val category: PostCategory = PostCategory.C1,
+    val writer: Member
+) : Detectable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-    companion object {
-        fun contains(name: String): Boolean {
-            return values().any { it.name == name }
-        }
+        other as Post
+
+        if (title != other.title) return false
+        if (content != other.content) return false
+        if (isDeleted != other.isDeleted) return false
+        return category == other.category
     }
+
+    override fun hashCode(): Int {
+        var result = title.hashCode()
+        result = 31 * result + content.hashCode()
+        result = 31 * result + isDeleted.hashCode()
+        result = 31 * result + category.hashCode()
+        return result
+    }
+
 }
+
+interface Detectable {
+    override fun hashCode(): Int
+    override fun equals(other: Any?): Boolean
+}
+
+data class Item(
+    val order: Int,
+    val propertyName: String,
+    val label: String,
+    val v1: String = "",
+    val v2: String = ""
+)
+
 /**
  * 두 객체를 비교해 변경된 부분을 찾는 함수
  * @param origin 기존 객체
  * @param target 비교 대상 객체
- * @param titles key: 필드 이름, value: 보여줄 이름
- * @param booleanTitles first: 필드 이름, second: true인 경우, third: false인 경우
+ * @param itemList 변경을 감지할 아이템 리스트
  * */
-inline fun <reified T: Any> findChanges(
+inline fun <reified T : Any> findChanges(
     origin: T,
     target: T,
-    titles: Map<String, String>,
-    vararg booleanTitles: Triple<String, String, String>
-): List<Triple<String, String, String>> {
+    itemList: List<Item>
+): List<Item> {
     val clazz = T::class
 
-    val result = mutableListOf<Triple<String, String, String>>()
+    val result = mutableListOf<Item>()
+
     for (property in clazz.memberProperties) {
-        val pName = property.name
-        if (!BasicFunctionName.contains(pName)) {
+        val propertyName = property.name
 
+        itemList.find { it.propertyName == propertyName }?.let {
             val originValue = property.get(origin).toString()
-            val changedValue = property.get(target).toString()
+            val targetValue = property.get(target).toString()
 
-            if (originValue != changedValue) {
-                if (property.returnType.toString().lowercase().contains("boolean")) {
-                    val index = booleanTitles.indexOfFirst { it.first == pName }
+            if (originValue != targetValue) {
+                val v1 = it.v1.ifEmpty { originValue }
+                val v2 = it.v2.ifEmpty { targetValue }
 
-                    if(index == -1) error("[$pName] : 필드를 찾을 수 없습니다.")
-
-                    val title = titles[pName] ?: error("[$pName] : 존재하지 않는 필드입니다.")
-
-                    val trueValue = booleanTitles[index].second
-                    val falseValue = booleanTitles[index].third
-
-                    val r1 = if(originValue.toBoolean()) trueValue else falseValue
-                    val r2 = if(changedValue.toBoolean()) trueValue else falseValue
-
-                    result += Triple(title, r1, r2)
-
-                } else {
-                    val title = titles[pName] ?: error("[$pName] : 존재하지 않는 필드입니다.")
-                    result += Triple(title, originValue, changedValue)
-                }
+                result += Item(it.order, it.propertyName, it.label, v1, v2)
             }
         }
     }
-    return result
+    return result.sortedBy { it.order }
 }
 
+val origin = Post("제목1","내용1", writer = Member("admin", "1234"))
+val changed = Post("제목1", "내용1", true, PostCategory.C2, writer = Member("tester", "1234"))
+
 fun main() {
-    val origin = Post().also {
-        it.title = "제목1"
-        it.content = "내용1"
-    }
-    val changed = Post().also {
-        it.title = "제목2"
-        it.content = "내용2"
-        it.isDeleted = true
-        it.category = PostCategory.C2
-    }
-    val titles = mapOf(
-        "title" to "제목", "content" to "내용",
-        "category" to "카테고리", "isDeleted" to "삭제 여부"
+    val items = listOf(
+        Item(1, "title", "제목"),
+        Item(2, "writer", "작성자", origin.writer.username, changed.writer.username),
+        Item(3, "category", "카테고리"),
+        Item(4, "isDeleted", "삭제여부", "삭제됨", "삭제되지 않음")
     )
-    val booleanTitles = arrayOf(
-        Triple("isDeleted", "삭제됨", "삭제되지 않음")
-    )
-    val changeList = findChanges(origin, changed, titles, *booleanTitles)
+
+    val changeList = findChanges(origin, changed, items)
     println(changeList)
 }
