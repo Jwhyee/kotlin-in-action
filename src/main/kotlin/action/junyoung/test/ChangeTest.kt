@@ -63,10 +63,10 @@ data class Item(
  * @param target 비교 대상 객체
  * @param itemList 변경을 감지할 아이템 리스트
  * */
-inline fun <reified T : Any> findChanges(
+inline fun <reified T : Detectable> findChanges(
     origin: T,
     target: T,
-    itemList: List<Item>
+    itemList: List<Item>,
 ): List<Item> {
     val clazz = T::class
 
