@@ -27,6 +27,15 @@ fun <T> copyData3(
     }
 }
 
+fun anyList(list: List<Any>) {
+    println(list)
+}
+
+fun addAnswer(list: MutableList<Any>) {
+    list.add(42)
+}
+
+
 fun main() {
     val ints = mutableListOf(1, 2, 3)
     val anyItems = mutableListOf<Any>()
@@ -36,4 +45,11 @@ fun main() {
 
     copyData2(ints, anyItems)
     println(anyItems)
+
+    val anyComparator = Comparator<Any> { e1, e2 ->
+        e1.hashCode() - e2.hashCode()
+    }
+
+    val strings = listOf("S1", "S2")
+    strings.sortedWith(anyComparator)
 }
