@@ -1,5 +1,6 @@
 package action.junyoung.chapter09.part3
 
+import java.lang.IllegalArgumentException
 import java.util.Collections
 import java.util.Random
 import kotlin.reflect.KClass
@@ -10,7 +11,7 @@ fun printFirst(list: List<*>) {
     }
 }
 
-private interface FieldValidator<in T> {
+interface FieldValidator<in T> {
     fun validate(input: T): Boolean
 }
 
@@ -20,6 +21,23 @@ private object DefaultStringValidator : FieldValidator<String> {
 
 private object DefaultIntValidator : FieldValidator<Int> {
     override fun validate(input: Int) = input >= 0
+}
+
+object Validators {
+    private val validators = mutableMapOf<KClass<*>, FieldValidator<*>>()
+
+    fun <T : Any> registerValidator(
+        kClass: KClass<T>, fieldValidator: FieldValidator<T>
+    ) {
+        validators[kClass] = fieldValidator
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T : Any> get(kClass: KClass<T>): FieldValidator<T> =
+        validators[kClass] as? FieldValidator<T>
+            ?: throw IllegalArgumentException(
+                "No validator for ${kClass.simpleName}"
+            )
 }
 
 fun validatorTest() {
@@ -32,6 +50,10 @@ fun validatorTest() {
     val stringValidator = validators[String::class] as FieldValidator<String>
     stringValidator.validate("Hello")
 
+    val stringFaultValidator = validators[Int::class] as FieldValidator<String>
+    println(stringFaultValidator.validate(""))
+
+//    println(Validators[String::class].validate(42))
 }
 
 fun main() {
